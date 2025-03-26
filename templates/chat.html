@@ -1,0 +1,33 @@
+<!-- templates/chat.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Flask Chat</title>
+</head>
+<body>
+    <h2>Simple Flask Chat</h2>
+    <div id="chat-box"></div>
+    <input id="msg" type="text" placeholder="Enter message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('message', (msg) => {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<p>${msg}</p>`;
+        });
+
+        function sendMessage() {
+            const msg = document.getElementById('msg').value;
+            socket.send(msg);
+            document.getElementById('msg').value = '';
+        }
+    </script>
+</body>
+</html>
