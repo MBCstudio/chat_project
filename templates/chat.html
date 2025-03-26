@@ -3,21 +3,41 @@
 <html lang="en">
 <head>
     <title>Flask Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h2>Simple Flask Chat</h2>
-    <div id="chat-box"></div>
-    <input id="msg" type="text" placeholder="Enter message...">
-    <button onclick="sendMessage()">Send</button>
+    <div class="container">
+        <h2 id="welcome-message">Podaj swoją nazwę użytkownika:</h2>
+        <input id="username" type="text" placeholder="Twoja nazwa użytkownika">
+        <button onclick="enterChat()">Wejdź na czat</button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+        <div id="chat" style="display: none;">
+            <h2 id="greeting"></h2>
+            <div id="chat-box"></div>
+            <input id="msg" type="text" placeholder="Enter message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
     <script>
         const socket = io();
+        let username = "";
 
-        socket.on('connect', () => {
-            console.log('Connected to server');
-        });
+        function enterChat() {
+            username = document.getElementById("username").value.trim();
+            if (username === "") {
+                alert("Proszę podać nazwę użytkownika");
+                return;
+            }
+            document.getElementById("welcome-message").style.display = "none";
+            document.getElementById("username").style.display = "none";
+            document.querySelector("button").style.display = "none";
+            document.getElementById("chat").style.display = "block";
+            document.getElementById("greeting").innerText = `Witaj, ${username}!`;
+        }
 
+        {#all clients see all messages#}
         socket.on('message', (msg) => {
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML += `<p>${msg}</p>`;
@@ -25,8 +45,10 @@
 
         function sendMessage() {
             const msg = document.getElementById('msg').value;
-            socket.send(msg);
-            document.getElementById('msg').value = '';
+            if (msg.trim() !== "") {
+                socket.send(`${username}: ${msg}`);
+                document.getElementById('msg').value = '';
+            }
         }
     </script>
 </body>
