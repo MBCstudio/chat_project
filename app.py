@@ -1,35 +1,42 @@
-# app.py
-
 from flask import Flask, render_template
-from flask_socketio import SocketIO, send
-import threading
+from flask_socketio import SocketIO, send#dodatek do Flask umożliwiwa komunikacje w czasie rzeczywistym
+import threading#wątki
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
 
-# Thread-safe lock for managing messages
-message_lock = threading.Lock()#safe acess to list of messages (deadlock can be there)
+
+message_lock = threading.Lock()#zabezpiecznie dostepu do listy wiadomosci by kilka watkow nie pisalo do niej jednoczenie (Race condition)
 messages = []
 
-@app.route('/')
+@app.route('/')#renderowanie wygladu chatu
 def index():
     return render_template('chat.html')
 
-@app.route('/threads')#to check how many threads are working in the same time
+@app.route('/threads')#pokazuje aktywna liczbe watkow wdanym momencie
 def thread_count():
     return f"Aktualna liczba wątków: {threading.active_count()}"
 
 
-# Handle incoming messages
+# odpowiedzane za przychodze wiadomosci
+# Funkcja obsługująca zdarzenie 'message' z SocketIO (czyli przychodzącą wiadomość od klienta)
 @socketio.on('message')
 def handle_message(msg):
-    thread_count()#showing active count of threads
-    with message_lock:  # Ensure thread-safe access
+    # Wywołanie pomocniczej funkcji, która zwraca liczbę aktywnych wątków (można to zobaczyć np. w konsoli)
+    thread_count()
+
+    # Blok 'with' z użyciem locka - zapewnia, że tylko jeden wątek na raz może modyfikować listę messages
+    with message_lock:
+        # Dodanie otrzymanej wiadomości do listy przechowywanej na serwerze
         messages.append(msg)
+        # Wydrukowanie wiadomości w konsol
         print(f"Message received: {msg}")
-    send(msg, broadcast=True)  # Send to all clients
+
+    # Wysłanie wiadomości do wszystkich polaczych klientow
+    send(msg, broadcast=True)
+
 
 if __name__ == '__main__':
     print("Starting chat server...")

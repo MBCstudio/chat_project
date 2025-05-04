@@ -21,33 +21,34 @@
     </div>
 
     <script>
-        const socket = io();
-        let username = "";
+        const socket = io();//tworzy polaczenie z serwerem socke.IO
+        let username = "";//nazw uzytkownika
 
         function enterChat() {
-            username = document.getElementById("username").value.trim();
+            username = document.getElementById("username").value.trim();//pobieranie  nazwy uzytkownika i wiadomosci z textfield
             if (username === "") {
                 alert("Proszę podać nazwę użytkownika");
                 return;
             }
-            document.getElementById("welcome-message").style.display = "none";
-            document.getElementById("username").style.display = "none";
-            document.querySelector("button").style.display = "none";
-            document.getElementById("chat").style.display = "block";
-            document.getElementById("greeting").innerText = `Witaj, ${username}!`;
+            document.getElementById("welcome-message").style.display = "none";//naglowek style.display = none ukrywa ekran powitalny. po poprawnym 'zalogowaniu'
+            document.getElementById("username").style.display = "none";//pole do imienia
+            document.querySelector("button").style.display = "none";//przycisk
+            document.getElementById("chat").style.display = "block";//Pokazuje właściwy interfejs czatu (ukryty domyślnie).
+            document.getElementById("greeting").innerText = `Witaj, ${username}!`;//Wyświetla powitanie z wpisanym imieniem użytkownika
+
         }
 
         {#all clients see all messages#}
-        socket.on('message', (msg) => {
+        socket.on('message', (msg) => {//gdy serwer wysle wiadomosc ta funkcja ja odbiera
             const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML += `<p>${msg}</p>`;
+            chatBox.innerHTML += `<p>${msg}</p>`;//dodanie wiadomosci na stronie tak aby byla widoczna dla usera
         });
 
-        function sendMessage() {
-            const msg = document.getElementById('msg').value;
-            if (msg.trim() !== "") {
-                socket.send(`${username}: ${msg}`);
-                document.getElementById('msg').value = '';
+        function sendMessage() {//oblsuga wyslania wiadomosci
+            const msg = document.getElementById('msg').value;//Pobiera wiadomość wpisaną przez użytkownika z pola tekstowego.
+            if (msg.trim() !== "") {//jesli niepusta
+                socket.send(`${username}: ${msg}`);//wysyla wiadomosc do serwera
+                document.getElementById('msg').value = '';//czyszzenie pola textowego
             }
         }
     </script>
