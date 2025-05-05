@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO, send#dodatek do Flask umożliwiwa komunikacje w czasie rzeczywistym
+from flask_socketio import SocketIO, send, emit#dodatek do Flask umożliwiwa komunikacje w czasie rzeczywistym
 import threading#wątki
 
 
@@ -25,7 +25,7 @@ def thread_count():
 @socketio.on('message')
 def handle_message(msg):
     # Wywołanie pomocniczej funkcji, która zwraca liczbę aktywnych wątków (można to zobaczyć np. w konsoli)
-    thread_count()
+    print(thread_count())
 
     # Blok 'with' z użyciem locka - zapewnia, że tylko jeden wątek na raz może modyfikować listę messages
     with message_lock:
@@ -36,6 +36,13 @@ def handle_message(msg):
 
     # Wysłanie wiadomości do wszystkich polaczych klientow
     send(msg, broadcast=True)
+
+@socketio.on('join_chat')#odpowiedzialna za historie chatu dla nowych userow
+def handle_join_chat():
+    print("Nowy klient wszedł na czat.")
+    with message_lock:
+        for msg in messages:#wszystkie wiadomosci dla nowych userow
+            emit('message', msg)  # emit działa tylko do klienta, który wywołał zdarzenie
 
 
 if __name__ == '__main__':

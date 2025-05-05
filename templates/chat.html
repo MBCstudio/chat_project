@@ -36,13 +36,17 @@
             document.getElementById("chat").style.display = "block";//Pokazuje właściwy interfejs czatu (ukryty domyślnie).
             document.getElementById("greeting").innerText = `Witaj, ${username}!`;//Wyświetla powitanie z wpisanym imieniem użytkownika
 
+            setupSocketListeners();
+            socket.emit('join_chat');  // Poproś serwer o przeslanie historii
+
         }
 
-        {#all clients see all messages#}
-        socket.on('message', (msg) => {//gdy serwer wysle wiadomosc ta funkcja ja odbiera
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML += `<p>${msg}</p>`;//dodanie wiadomosci na stronie tak aby byla widoczna dla usera
-        });
+        function setupSocketListeners() {
+            socket.on('message', (msg) => {//gdy serwer wysle wiadomosc ta funkcja ja odbiera
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML += `<p>${msg}</p>`;//dodanie wiadomosci na stronie tak aby byla widoczna dla usera
+            });
+        }
 
         function sendMessage() {//oblsuga wyslania wiadomosci
             const msg = document.getElementById('msg').value;//Pobiera wiadomość wpisaną przez użytkownika z pola tekstowego.

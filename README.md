@@ -1,4 +1,7 @@
 ## Opis projektu
+Projekt został zrealizowany przez:
+1. Marcina Borkowskiego
+2. Piotr Strycharczyk
 
 Projekt realizuje prosty czat internetowy oparty na **Flasku** i **Socket.IO**, umożliwiający komunikację w czasie rzeczywistym między wieloma użytkownikami. Aplikacja webowa renderuje interfejs użytkownika, natomiast serwer Flask odbiera i rozsyła wiadomości przy użyciu WebSocketów.
 
